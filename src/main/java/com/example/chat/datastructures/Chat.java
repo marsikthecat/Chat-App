@@ -1,4 +1,4 @@
-package com.example.chat;
+package com.example.chat.datastructures;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -16,6 +16,7 @@ public class Chat implements Serializable {
 
   @Serial
   private static final long serialVersionUID = 1L;
+  private int id;
   private final String date;
   private final List<Message> messageList;
 
@@ -40,6 +41,14 @@ public class Chat implements Serializable {
     messageList.add(message);
   }
 
+  public void setId(int id) {
+    this.id = id;
+  }
+
+  public int getId() {
+    return id;
+  }
+
   public String getDate() {
     return date;
   }
@@ -47,8 +56,7 @@ public class Chat implements Serializable {
   /**
    * Creates a List of MessageBoxes from messages that are in the List.
    */
-
-  public List<HBox> getMessageBoxes() {
+  public List<HBox> getListOfChatBubbles() {
     List<HBox> messageBoxes = new ArrayList<>();
     for (Message message : messageList) {
       messageBoxes.add(message.getMessageBubble());

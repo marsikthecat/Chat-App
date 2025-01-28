@@ -1,4 +1,4 @@
-package com.example.chat;
+package com.example.chat.datastructures;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -8,7 +8,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.ResourceBundle;
 import javafx.scene.control.Label;
 
@@ -16,7 +15,7 @@ import javafx.scene.control.Label;
  * ChatStorage that stores Chats Objects.
  */
 
-public class ChatStorage extends HashMap<Integer, Chat> implements Serializable {
+public class ChatStorage extends ArrayList<Chat> implements Serializable {
 
   @Serial
   private static final long serialVersionUID = 1L;
@@ -27,7 +26,6 @@ public class ChatStorage extends HashMap<Integer, Chat> implements Serializable 
   /**
    * saves the Chat by serialization.
    */
-
   public void updateChatStorage() {
     try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("Storage.ser"))) {
       out.writeObject(this);
@@ -50,12 +48,9 @@ public class ChatStorage extends HashMap<Integer, Chat> implements Serializable 
     }
   }
 
-  /**
-   * Adds the chat to the array, sets up the id and creation date of the new chat.
-   */
-
   public void addChat(Chat chat) {
-    put(id++, chat);
+    chat.setId(id++);
+    add(chat);
   }
 
   public Chat getChat(int id) {
@@ -63,32 +58,30 @@ public class ChatStorage extends HashMap<Integer, Chat> implements Serializable 
   }
 
   /**
-   * Searches the Hashmap for empty chats, starting from the most current one.
-   * if the user wants to create a new chat and there is already an empty one in the storage,
-   * the index i of this chat gets return so this chat can be retrieved for loading it.
-   * if there is no empty chat, it returns -1 and the main programm creates a new empty chat.
+   * Searches for an already existing chat that is empty.
+   * If there is an empty chat it returns it with "false" (=No new Chat created).
+   * If no empty chat is found, it returns a new chat with "true" (=New Chat was created).
    */
-
-  public int checkForEmptyChats() {
+  public Object[] getNewChat() {
     for (int i = size() - 1; i >= 0; i--) {
-      if (get(i).isEmpty()) {
-        return i;
+      Chat chat = get(i);
+      if (chat.isEmpty()) {
+        return new Object[]{chat, false};
       }
     }
-    return -1;
+    return new Object[]{new Chat(), true};
   }
 
   /**
    * Creates a List of Labels that visualizes all the chat objects stores in the array,
    * writes the content and sets up the id and returns it.
    */
-
   public ArrayList<Label> visualizeChats(ResourceBundle bundle) {
     ArrayList<Label> labels = new ArrayList<>();
     for (int i = 0; i < size(); i++) {
       Chat chat = get(i);
-      Label label = new Label(bundle.getString("chat_from")
-          + " "  + chat.getDate() + "\n" + i);
+      Label label = new Label(bundle.getString("chat_from") + " "
+              + chat.getDate() + "\n" + "ID:" + i);
       label.setId(String.valueOf(i));
       labels.add(label);
     }

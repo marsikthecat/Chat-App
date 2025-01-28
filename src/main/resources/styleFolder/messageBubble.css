@@ -1,0 +1,17 @@
+.message-bubble {
+    -fx-font-size: 13pt;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 3, 0, 0, 1);
+    -fx-padding: 10px;
+    -fx-max-width: 340px;
+    -fx-background-radius: 15;
+}
+
+.message-from-me {
+    -fx-background-color: lightblue;
+    -fx-background-radius: 15 15 0 15;
+}
+
+.message-from-others {
+    -fx-background-color: lightgreen;
+    -fx-background-radius: 15 15 15 0;
+}

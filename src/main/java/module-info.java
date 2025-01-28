@@ -5,4 +5,8 @@ module com.example.chat {
 
     opens com.example.chat to javafx.fxml;
     exports com.example.chat;
+    exports com.example.chat.datastructures;
+    opens com.example.chat.datastructures to javafx.fxml;
+    exports com.example.chat.utils;
+    opens com.example.chat.utils to javafx.fxml;
 }

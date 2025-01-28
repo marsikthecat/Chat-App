@@ -1,5 +1,7 @@
-package com.example.chat;
+package com.example.chat.utils;
 
+import com.example.chat.datastructures.Chat;
+import com.example.chat.datastructures.ChatStorage;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.ResourceBundle;
