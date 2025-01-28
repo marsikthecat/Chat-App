@@ -26,8 +26,7 @@ public record Message(String content, User user) implements Serializable {
    */
   public HBox getMessageBubble() {
     Label messageLabel = new Label(content);
-    messageLabel.setWrapText(true); // Ensure the text wraps within the bubble
-
+    messageLabel.setWrapText(true);
     HBox messageBubble = new HBox(messageLabel);
     Pos alignment = (user == User.FROM_ME) ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT;
     BackgroundFill backgroundFill = new BackgroundFill(
@@ -42,7 +41,6 @@ public record Message(String content, User user) implements Serializable {
     messageBubble.setPrefWidth(Region.USE_COMPUTED_SIZE);
     messageBubble.setStyle("-fx-font-size: 13pt; "
             + "-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 3, 0, 0, 1);");
-
     return messageBubble;
   }
 }

@@ -1,0 +1,16 @@
+.chat-label {
+    -fx-font-size: 12pt;
+    -fx-padding: 10px;
+    -fx-background-color: #f0f0f0;
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0, 0, 1);
+    -fx-pref-width: 350;
+}
+
+.chat-label:hover {
+    -fx-background-color: #e0e0e0;
+    -fx-border-color: #bbbbbb;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 4, 0, 0, 2);
+}
