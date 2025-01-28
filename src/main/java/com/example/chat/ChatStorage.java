@@ -63,6 +63,22 @@ public class ChatStorage extends HashMap<Integer, Chat> implements Serializable 
   }
 
   /**
+   * Searches the Hashmap for empty chats, starting from the most current one.
+   * if the user wants to create a new chat and there is already an empty one in the storage,
+   * the index i of this chat gets return so this chat can be retrieved for loading it.
+   * if there is no empty chat, it returns -1 and the main programm creates a new empty chat.
+   */
+
+  public int checkForEmptyChats() {
+    for (int i = size() - 1; i >= 0; i--) {
+      if (get(i).isEmpty()) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  /**
    * Creates a List of Labels that visualizes all the chat objects stores in the array,
    * writes the content and sets up the id and returns it.
    */
@@ -72,7 +88,7 @@ public class ChatStorage extends HashMap<Integer, Chat> implements Serializable 
     for (int i = 0; i < size(); i++) {
       Chat chat = get(i);
       Label label = new Label(bundle.getString("chat_from")
-         + " "  + chat.getDate() + "\n" + i);
+          + " "  + chat.getDate() + "\n" + i);
       label.setId(String.valueOf(i));
       labels.add(label);
     }

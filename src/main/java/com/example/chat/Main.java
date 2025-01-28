@@ -21,12 +21,12 @@ import javafx.util.Duration;
 
 /**
  * Main Program for chat.
- * Main: 139 lines of code.
+ * Main: 141 lines of code.
  * Responder: 30 lines of code.
- * Message: 48 lines of code.
+ * Message: 46 lines of code.
  * Chat: 62 lines of code.
- * ChatStorage: 85 lines of code.
- * SelectChatWindow: 58 lines of code.
+ * ChatStorage: 97 lines of code.
+ * SelectChatWindow: 59 lines of code.
  * 455 lines of code.
  */
 
@@ -40,8 +40,13 @@ public class Main extends Application {
 
   @Override
   public void start(Stage stage) {
-    this.chat = new Chat();
-    chatStorage.addChat(chat);
+    int possibleEmptyChatIndex = chatStorage.checkForEmptyChats();
+    if (possibleEmptyChatIndex != -1) {
+      this.chat = chatStorage.get(possibleEmptyChatIndex);
+    } else {
+      this.chat = new Chat();
+      chatStorage.addChat(chat);
+    }
     VBox chatSectionBox = new VBox();
     chatSectionBox.setAlignment(Pos.BASELINE_CENTER);
     chatSectionBox.setSpacing(10);
@@ -99,10 +104,17 @@ public class Main extends Application {
     fileMenu.getItems().addAll(newChatItem, loadChatItem);
     newChatItem.setOnAction(e -> {
       if (!chat.isEmpty()) {
-        this.chat = new Chat();
-        chatStorage.addChat(chat);
-        stage.setTitle(resourceBundle.getString("new_chat"));
-        loadChat(chatSectionBox);
+        int indexOfNextEmptyChat = chatStorage.checkForEmptyChats();
+        if (indexOfNextEmptyChat == -1) {
+          this.chat = new Chat();
+          chatStorage.addChat(chat);
+          stage.setTitle(resourceBundle.getString("new_chat"));
+          loadChat(chatSectionBox);
+        } else {
+          this.chat = chatStorage.get(indexOfNextEmptyChat);
+          stage.setTitle("Id: " + indexOfNextEmptyChat);
+          loadChat(chatSectionBox);
+        }
       } else {
         stage.setTitle(resourceBundle.getString("already_new_chat"));
       }
