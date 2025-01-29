@@ -29,7 +29,7 @@ import javafx.util.Duration;
  * ChatStorage: 90 lines of code.
  * Message: 33 lines of code.
  * DynamicMenu: 76 lines of code.
- * Main: 163 lines of code.
+ * Main: 164 lines of code.
  * Responder: 27 lines of code.
  * 460 lines of code.
  */
