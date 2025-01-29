@@ -4,23 +4,24 @@ import com.example.chat.datastructures.Message;
 import java.util.Random;
 
 /**
- * Responder Class that generates a response.
+ * Singleton Responder Class that generates a response.
  */
 
 public class Responder {
-  private final String[] start = {"Hello", "Hey", "Here you are again", "Hey bro",
-    "Hello man", "Hello bro"};
-  private final String[] noAnswer = {"I don't understand you", "Bye"};
+  private static final Responder responder = new Responder();
+  private final String[] answers = {"Hey bro", "I don't know", "Bye"};
+
+  private Responder() {}
+
+  public static Responder getInstance() {
+    return responder;
+  }
 
   /**
-  * Return Message Object.
+  * Return Message Object with random response.
   */
-  public Message makeRespond(String message) {
+  public Message makeRespond() {
     Random random = new Random();
-    if (message.contains("hello")) {
-      return new Message(start[random.nextInt(start.length)], 1);
-    } else {
-      return new Message(noAnswer[random.nextInt(noAnswer.length)], 1);
-    }
+    return new Message(answers[random.nextInt(answers.length)], 1);
   }
 }

@@ -3,7 +3,7 @@ package com.example.chat;
 import com.example.chat.datastructures.Chat;
 import com.example.chat.datastructures.ChatStorage;
 import com.example.chat.datastructures.Message;
-import com.example.chat.utils.SelectChatWindow;
+import com.example.chat.uiutils.DynamicMenu;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Objects;
@@ -13,12 +13,10 @@ import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -30,21 +28,22 @@ import javafx.util.Duration;
  * Chat: 70 lines of code.
  * ChatStorage: 90 lines of code.
  * Message: 33 lines of code.
- * SelectChatWindow: 60 lines of code.
+ * DynamicMenu: 76 lines of code.
  * Main: 163 lines of code.
- * Responder: 30 lines of code.
- * 446 lines of code.
+ * Responder: 27 lines of code.
+ * 460 lines of code.
  */
 
 public class Main extends Application {
 
-  private final Responder responder = new Responder();
+  private final Responder responder = Responder.getInstance();
   private final ChatStorage chatStorage = ChatStorage.loadChatStorage();
   private Chat chat;
-  private final ResourceBundle resourceBundle =
+  private final ResourceBundle bundle =
           ResourceBundle.getBundle("messages", Locale.getDefault());
   private Stage stage;
-  private VBox chatSectionBox;
+  private VBox chatBox;
+  private DynamicMenu dynamicMenu;
 
   @Override
   public void start(Stage stage) {
@@ -57,19 +56,30 @@ public class Main extends Application {
     } else {
       changeTitle("chat_from", chat.getDate(), " ID: ", chat.getId());
     }
-    chatSectionBox = new VBox();
-    chatSectionBox.setAlignment(Pos.BASELINE_CENTER);
-    chatSectionBox.setSpacing(10);
-    chatSectionBox.setStyle("-fx-padding: 7px");
-    ScrollPane scrollPane = new ScrollPane(chatSectionBox);
+    chatBox = new VBox();
+    chatBox.setAlignment(Pos.BASELINE_CENTER);
+    chatBox.setSpacing(10);
+    chatBox.setStyle("-fx-padding: 7px");
+    ScrollPane scrollPane = new ScrollPane(chatBox);
     scrollPane.setPrefSize(400, 230);
     scrollPane.setFitToWidth(true);
     scrollPane.setFitToHeight(true);
     VBox.setVgrow(scrollPane, Priority.ALWAYS);
 
+    dynamicMenu = new DynamicMenu(chatStorage, bundle);
+    dynamicMenu.getChat().addListener((observable, oldChat, newChat) -> {
+      this.chat = newChat;
+      changeTitle("chat_from", chat.getDate(), " ID: " + chat.getId());
+      loadChat();
+    });
+
+    Button newChatBtn = new Button(bundle.getString("create_new_chat"));
+    newChatBtn.setOnMouseClicked(e -> actOnNewChatRequest());
+    dynamicMenu.addCreationBtn(newChatBtn);
+
     HBox ioBox = new HBox(10);
     ioBox.setStyle("-fx-padding: 10px");
-    Button sendBtn = new Button(resourceBundle.getString("sent_message"));
+    Button sendBtn = new Button(bundle.getString("sent_message"));
     TextField input = new TextField();
     ioBox.getChildren().addAll(input, sendBtn);
 
@@ -79,15 +89,28 @@ public class Main extends Application {
         addMessages(input.getText());
       }
     });
+    Button menuButton = new Button("≡");
+    menuButton.setOnAction(e -> {
+      dynamicMenu.setChatProperty(this.chat);
+      dynamicMenu.toggleMenu();
+    });
+
     VBox content = new VBox();
-    MenuBar menuBar = createMenuBar();
-    content.getChildren().addAll(menuBar, scrollPane, ioBox);
-    stage.setResizable(false);
-    stage.setOnCloseRequest(e -> chatStorage.updateChatStorage());
-    Scene scene = new Scene(content, 420, 300);
+    content.getChildren().addAll(scrollPane, ioBox);
+
+    HBox mainContent = new HBox();
+    mainContent.getChildren().addAll(dynamicMenu, content);
+
+    BorderPane root = new BorderPane();
+    root.setCenter(mainContent);
+    root.setLeft(menuButton);
+    Scene scene = new Scene(root, 600, 400);
     scene.getStylesheets().add(Objects.requireNonNull(getClass()
-            .getResource("/styleFolder/messageBubble.css")).toExternalForm()
-    );
+            .getResource("/styleFolder/messageBubble.css")).toExternalForm());
+    scene.getStylesheets().add(Objects.requireNonNull(
+            getClass().getResource("/styleFolder/visualizedChatLabel.css")).toExternalForm());
+    stage.setOnCloseRequest(e -> chatStorage.updateChatStorage());
+    stage.setResizable(false);
     stage.setScene(scene);
     stage.show();
   }
@@ -98,37 +121,14 @@ public class Main extends Application {
   public void addMessages(String messageText) {
     Message message = new Message(messageText, 0);
     chat.addMessage(message);
-    chatSectionBox.getChildren().add(message.getMessageBubble());
+    chatBox.getChildren().add(message.getMessageBubble());
     PauseTransition pause = new PauseTransition(Duration.seconds(2));
     pause.setOnFinished(e -> {
-      Message respondMessage = responder.makeRespond(messageText);
+      Message respondMessage = responder.makeRespond();
       chat.addMessage(respondMessage);
-      chatSectionBox.getChildren().add(respondMessage.getMessageBubble());
+      chatBox.getChildren().add(respondMessage.getMessageBubble());
     });
     pause.play();
-  }
-
-  private MenuBar createMenuBar() {
-    Menu fileMenu = new Menu("Chat");
-    MenuItem newChatItem = new MenuItem(resourceBundle.getString("create_new_chat"));
-    MenuItem loadChatItem = new MenuItem(resourceBundle.getString("show_previous_chats"));
-    fileMenu.getItems().addAll(newChatItem, loadChatItem);
-    newChatItem.setOnAction(e -> actOnNewChatRequest());
-    loadChatItem.setOnAction(e ->  selectNewChat());
-    MenuBar menuBar = new MenuBar();
-    menuBar.getMenus().addAll(fileMenu);
-    return menuBar;
-  }
-
-  private void selectNewChat() {
-    SelectChatWindow selectChatWindow = new SelectChatWindow(chatStorage, resourceBundle);
-    selectChatWindow.showAndWait();
-    Chat selectedChat = selectChatWindow.getSelectedChat();
-    if (selectedChat != null) {
-      chat = selectChatWindow.getSelectedChat();
-      changeTitle("chat_from", chat.getDate(), " ID: ", chat.getId());
-      loadChat();
-    }
   }
 
   private void actOnNewChatRequest() {
@@ -139,6 +139,7 @@ public class Main extends Application {
       this.chat = (Chat) object[0];
       if ((boolean) object[1]) {
         chatStorage.addChat(chat);
+        dynamicMenu.loadChatLabels(bundle, chatStorage);
         changeTitle("new_chat", chat.getId());
       } else {
         changeTitle("chat_from", chat.getDate(), " ID: " + chat.getId());
@@ -148,13 +149,13 @@ public class Main extends Application {
   }
 
   private void loadChat() {
-    chatSectionBox.getChildren().clear();
-    chatSectionBox.getChildren().addAll(chat.getListOfChatBubbles());
+    chatBox.getChildren().clear();
+    chatBox.getChildren().addAll(chat.getListOfChatBubbles());
   }
 
   private void changeTitle(String key, Object... furtherText) {
     String furtherTextString = Arrays.toString(furtherText);
-    stage.setTitle(resourceBundle.getString(key) + " " + furtherTextString);
+    stage.setTitle(bundle.getString(key) + " " + furtherTextString);
   }
 
   public static void main(String[] args) {
