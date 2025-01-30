@@ -27,6 +27,7 @@ public class DynamicMenu extends VBox {
      * Sets up the animation and then uses the method to load the chat labels.
      */
   public DynamicMenu(ChatStorage chatStorage, ResourceBundle bundle) {
+    this.setSpacing(10);
     this.setStyle("-fx-background-color: #DDDDDD; -fx-padding: 10px;");
     this.setTranslateX(-200);
     this.setAlignment(Pos.TOP_CENTER);
