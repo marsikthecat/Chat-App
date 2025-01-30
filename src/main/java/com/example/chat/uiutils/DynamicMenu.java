@@ -22,24 +22,24 @@ public class DynamicMenu extends VBox {
   private final TranslateTransition contentAnimation;
   private boolean isMenuVisible = false;
   private final ObjectProperty<Chat> chat = new SimpleObjectProperty<>();
+  private final Button creatingBtn;
 
   /**
-     * Sets up the animation and then uses the method to load the chat labels.
-     */
-  public DynamicMenu(ChatStorage chatStorage, ResourceBundle bundle) {
-    this.setSpacing(10);
-    this.setStyle("-fx-background-color: #DDDDDD; -fx-padding: 10px;");
-    this.setTranslateX(-200);
+   * Sets up the animation and then uses the method to load the chat labels.
+   */
+  public DynamicMenu(ChatStorage chatStorage, ResourceBundle bundle, Button creatingBtn) {
+    this.creatingBtn = creatingBtn;
     this.setAlignment(Pos.TOP_CENTER);
+    this.setTranslateX(-200);
+    this.getStyleClass().add("dynamic-menu");
     contentAnimation = new TranslateTransition(Duration.millis(400), this);
     loadChatLabels(bundle, chatStorage);
   }
 
   /**
-     * loads the chat labels.
-     * this method will be also used for reloading if a chat gets added.
-     */
-
+   * loads the chat labels.
+   * this method will be also used for reloading if a chat gets added.
+   */
   public void loadChatLabels(ResourceBundle bundle, ChatStorage chatStorage) {
     getChildren().clear();
     Label previousChatLabel = new Label(bundle.getString("previous_chats"));
@@ -51,20 +51,16 @@ public class DynamicMenu extends VBox {
       label.setOnMouseClicked(e -> chat.set(chatStorage.getChat(labelId)));
       getChildren().add(label);
     }
+    getChildren().add(creatingBtn);
   }
 
   /**
-     * self explaining.
-     */
-
+   * self explaining.
+   */
   public void toggleMenu() {
     contentAnimation.setToX(isMenuVisible ? -200 : 0);
     contentAnimation.play();
     isMenuVisible = !isMenuVisible;
-  }
-
-  public void addCreationBtn(Button button) {
-    getChildren().add(button);
   }
 
   public void setChatProperty(Chat currentChat) {

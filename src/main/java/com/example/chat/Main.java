@@ -10,7 +10,6 @@ import java.util.ResourceBundle;
 import java.util.stream.Stream;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -29,10 +28,10 @@ import javafx.util.Duration;
  * Chat: 70 lines of code.
  * ChatStorage: 90 lines of code.
  * Message: 33 lines of code.
- * DynamicMenu: 76 lines of code.
- * Main: 164 lines of code.
+ * DynamicMenu: 73 lines of code.
+ * Main: 180 lines of code.
  * Responder: 27 lines of code.
- * 460 lines of code.
+ * 473 lines of code.
  */
 
 public class Main extends Application {
@@ -58,16 +57,18 @@ public class Main extends Application {
       changeTitle("chat_from", chat.getDate(), " ID: ", chat.getId());
     }
     chatBox = new VBox();
-    chatBox.setAlignment(Pos.BASELINE_CENTER);
-    chatBox.setSpacing(10);
-    chatBox.getStyleClass().add("container");
+    chatBox.getStyleClass().add("main-chat-container");
     ScrollPane scrollPane = new ScrollPane(chatBox);
     scrollPane.setPrefSize(400, 230);
     scrollPane.setFitToWidth(true);
     scrollPane.setFitToHeight(true);
     VBox.setVgrow(scrollPane, Priority.ALWAYS);
 
-    dynamicMenu = new DynamicMenu(chatStorage, bundle);
+    Button newChatBtn = new Button(bundle.getString("create_new_chat"));
+    newChatBtn.getStyleClass().add("main-button");
+    newChatBtn.setOnMouseClicked(e -> actOnNewChatRequest());
+
+    dynamicMenu = new DynamicMenu(chatStorage, bundle, newChatBtn);
     ScrollPane menuPane = new ScrollPane(dynamicMenu);
     menuPane.setPrefWidth(200);
     dynamicMenu.getChat().addListener((observable, oldChat, newChat) -> {
@@ -76,17 +77,12 @@ public class Main extends Application {
       loadChat();
     });
 
-    Button newChatBtn = new Button(bundle.getString("create_new_chat"));
-    newChatBtn.getStyleClass().add("button");
-    newChatBtn.setOnMouseClicked(e -> actOnNewChatRequest());
-    dynamicMenu.addCreationBtn(newChatBtn);
-
     HBox ioBox = new HBox(10);
     ioBox.setStyle("-fx-padding: 10px");
     Button sendBtn = new Button(bundle.getString("sent_message"));
-    sendBtn.getStyleClass().add("button");
+    sendBtn.getStyleClass().add("main-button");
     TextField input = new TextField();
-    input.getStyleClass().add("text-field");
+    input.getStyleClass().add("main-text-field");
     ioBox.getChildren().addAll(input, sendBtn);
 
     sendBtn.setOnAction(e -> addMessages(input.getText()));
@@ -141,10 +137,7 @@ public class Main extends Application {
 
   private void actOnNewChatRequest() {
     if (chat.isEmpty()) {
-      Alert alert = new Alert(Alert.AlertType.WARNING);
-      alert.setTitle("Warning");
-      alert.setHeaderText("You already have a new empty chat");
-      alert.showAndWait();
+      showWarning(bundle.getString("already_new_chat"), null);
     } else {
       Object[] object = chatStorage.getNewChat();
       this.chat = (Chat) object[0];
@@ -153,11 +146,8 @@ public class Main extends Application {
         dynamicMenu.loadChatLabels(bundle, chatStorage);
         changeTitle("new_chat", chat.getId());
       } else {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("Warning");
-        alert.setHeaderText("There are already empty chats in the storage");
-        alert.setContentText("The last empty chat has been loaded:" + chat.getId());
-        alert.showAndWait();
+        showWarning(bundle.getString("already_new_chats"),
+                bundle.getString("empty_chat_loaded") + chat.getId());
         changeTitle("chat_from", chat.getDate(), " ID: " + chat.getId());
       }
       loadChat();
@@ -167,6 +157,14 @@ public class Main extends Application {
   private void loadChat() {
     chatBox.getChildren().clear();
     chatBox.getChildren().addAll(chat.getListOfChatBubbles());
+  }
+
+  private void showWarning(String header, String content) {
+    Alert alert = new Alert(Alert.AlertType.WARNING);
+    alert.setTitle("Warning");
+    alert.setHeaderText(header);
+    alert.setContentText(content);
+    alert.showAndWait();
   }
 
   private void changeTitle(String key, Object... furtherText) {

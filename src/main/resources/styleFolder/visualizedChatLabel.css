@@ -1,3 +1,9 @@
+.dynamic-menu {
+    -fx-background-color: #DDDDDD;
+    -fx-padding: 10px;
+    -fx-spacing: 10px;
+}
+
 .chat-label {
     -fx-font-size: 7pt;
     -fx-padding: 5px;
@@ -6,7 +12,7 @@
     -fx-border-radius: 5px;
     -fx-background-radius: 5px;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0, 0, 1);
-    -fx-pref-width: 150;
+    -fx-pref-width: 150px;
 }
 
 .chat-label:hover {
