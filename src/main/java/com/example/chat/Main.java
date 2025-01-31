@@ -147,7 +147,7 @@ public class Main extends Application {
         changeTitle("new_chat", chat.getId());
       } else {
         showWarning(bundle.getString("already_new_chats"),
-                bundle.getString("empty_chat_loaded") + chat.getId());
+                bundle.getString("empty_chat_loaded") + " " + chat.getId());
         changeTitle("chat_from", chat.getDate(), " ID: " + chat.getId());
       }
       loadChat();

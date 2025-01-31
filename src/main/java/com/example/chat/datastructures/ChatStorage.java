@@ -81,7 +81,7 @@ public class ChatStorage extends ArrayList<Chat> implements Serializable {
     for (int i = 0; i < size(); i++) {
       Chat chat = get(i);
       Label label = new Label(bundle.getString("chat_from") + " "
-              + chat.getDate() + "\n" + "ID:" + i);
+              + chat.getDate() + "\n" + "ID: " + i);
       label.setId(String.valueOf(i));
       labels.add(label);
     }
